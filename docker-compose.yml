@@ -1,0 +1,39 @@
+services:
+  server:
+    build: ./server
+    container_name: server
+    ports:
+      - "1053:1053"
+    networks:
+      - pbl-net
+
+  sensor:
+    build: ./sensor
+    container_name: sensor
+    depends_on:
+      - server
+    networks:
+      - pbl-net
+    tty: true
+
+  atuador:
+    build: ./atuador
+    container_name: atuador
+    depends_on:
+      - server
+    networks:
+      - pbl-net
+
+  cliente:
+    build: ./cliente
+    container_name: cliente
+    depends_on:
+      - server
+    networks:
+      - pbl-net
+    stdin_open: true
+    tty: true
+
+networks:
+  pbl-net:
+    driver: bridge
