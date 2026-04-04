@@ -144,7 +144,7 @@ SERVER_ADDR=192.168.1.100:1053 docker compose run --rm cliente1
 
 ---
 
-## 🖥️ Como Usar
+## Como Usar
 
 ### Cliente
 
@@ -188,7 +188,7 @@ Exibe no terminal os comandos recebidos e o status atual:
 
 ---
 
-## ⚙️ Arquitetura
+## Arquitetura
 
 ```
 ┌─────────┐  UDP  ┌──────────────────────┐  TCP  ┌──────────┐
@@ -205,7 +205,7 @@ O broker centraliza a comunicação, eliminando o acoplamento ponto-a-ponto entr
 
 ---
 
-## 🔒 Concorrência
+## Concorrência
 
 - `sync.RWMutex` protege todos os mapas compartilhados (`sensors`, `topicos`, `mapaAtuadores`)
 - Worker pool de 10 goroutines processa pacotes UDP dos sensores com fila de 500 entradas
@@ -214,7 +214,7 @@ O broker centraliza a comunicação, eliminando o acoplamento ponto-a-ponto entr
 
 ---
 
-## 🛡️ Confiabilidade
+## Confiabilidade
 
 - Sensores inativos por mais de 5 segundos são removidos automaticamente
 - Clientes inativos por mais de 30 segundos têm a conexão encerrada (timeout)
