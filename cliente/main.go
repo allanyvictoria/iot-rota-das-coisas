@@ -76,8 +76,6 @@ func main() {
 			time.Sleep(200 * time.Millisecond)
 
 			// Modo monitoramento: aguarda ENTER para parar
-			fmt.Println("\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\")
-			fmt.Println("\n[Pressione ENTER para parar o monitoramento]")
 			leitura.ReadString('\n') // bloqueia até ENTER
 
 			// Envia qualquer coisa para desbloquear o conn.Read no servidor
