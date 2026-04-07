@@ -10,6 +10,7 @@ type Mensagem struct {
 	ID      string
 	COMANDO string
 	VALOR   string
+	Resposta chan string
 }
 
 func ParseMensagem(data []byte) (Mensagem, error) {
