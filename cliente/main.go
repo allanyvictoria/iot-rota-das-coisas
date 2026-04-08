@@ -76,7 +76,7 @@ func main() {
 			leitura.ReadString('\n') // bloqueia até ENTER
 
 			// Envia qualquer coisa para desbloquear o conn.Read no servidor
-			conn.Write([]byte("PARAR"))
+			conn.Write([]byte(";;PARAR;"))
 		}
 	}
 }

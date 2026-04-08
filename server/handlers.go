@@ -119,7 +119,11 @@ func lerComando(conn net.Conn, clienteId string) {
 					log.Printf("Mensagem inválida recebida: %v", err)
 					break
 				}
-
+				if msgSensor.COMANDO == "PARAR" {
+					unsubscribe(clienteId)
+					conn.Write([]byte("\n[SERVIDOR]: Monitoramento parado\n"))
+					break
+				}
 				rwmu.RLock()
 				_, exists := sensors[msgSensor.ID]
 				rwmu.RUnlock()
@@ -135,12 +139,6 @@ func lerComando(conn net.Conn, clienteId string) {
 					"\n[Pressione ENTER para parar o monitoramento]\n"
 				conn.Write([]byte(aviso))
 
-				pararMonitor := make([]byte, 1024)
-				conn.Read(pararMonitor)
-
-				unsubscribe(clienteId)
-				conn.Write([]byte("\n[SERVIDOR]: Monitoramento parado\n"))
-				break // sai do loop e volta ao menu
 			}
 		case "LISTAR":
 			sendAvailableSensors(conn)
