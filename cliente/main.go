@@ -13,6 +13,7 @@ import (
 func getServerAddr() string {
 	addr := os.Getenv("SERVER_ADDR")
 	if addr == "" {
+		// No Docker, use o nome do serviço (por exemplo, "server:1053")
 		addr = "server:1053" // Aqui "server" é o nome do serviço no Docker Compose
 	}
 	fmt.Println("Endereço do servidor:", addr)
@@ -56,16 +57,13 @@ func main() {
 	for {
 		escolha, _ := leitura.ReadString('\n')
 		escolha = strings.TrimSpace(escolha)
-
 		comando = lerComando(escolha)
 		if comando == "SAIR" {
 			fmt.Println("Encerrando cliente...")
 			return
 		}
-
 		dados := fmt.Sprintf("%s;%s;%s;%s", tipo, id, comando, "")
 		conn.Write([]byte(dados))
-
 		if comando == "ATUAR" {
 			dadosAtuador := escolhaAtuador(leitura)
 			conn.Write([]byte(dadosAtuador))
@@ -74,7 +72,6 @@ func main() {
 			dadosSensor := escolhaSensor(leitura)
 			conn.Write([]byte(dadosSensor))
 			time.Sleep(200 * time.Millisecond)
-
 			// Modo monitoramento: aguarda ENTER para parar
 			leitura.ReadString('\n') // bloqueia até ENTER
 
@@ -82,7 +79,6 @@ func main() {
 			conn.Write([]byte("PARAR"))
 		}
 	}
-
 }
 
 var menuPronto = make(chan struct{}, 1)
@@ -97,7 +93,6 @@ func lerServer(conn net.Conn, done chan bool) {
 			done <- true
 			return
 		}
-
 		fmt.Printf("%s", string(buffer[:n]))
 
 		if primeiraMsg {
@@ -122,7 +117,7 @@ func lerComando(comando string) string {
 	case "5":
 		return "PARAR_SENSOR"
 	default:
-		fmt.Println("Comando inválido. Tente novamente.")
+		fmt.Println("Comando desconhecido recebido.")
 		return ""
 	}
 

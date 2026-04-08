@@ -9,7 +9,6 @@ services:
 
   sensor:
     build: ./sensor
-    container_name: sensor
     depends_on:
       - server
     networks:
@@ -18,7 +17,6 @@ services:
 
   atuador:
     build: ./atuador
-    container_name: atuador
     depends_on:
       - server
     networks:
@@ -26,7 +24,6 @@ services:
 
   cliente:
     build: ./cliente
-    container_name: cliente
     depends_on:
       - server
     networks:
