@@ -14,14 +14,14 @@ type Sensor struct {
 	Last  time.Time
 }
 
-var mapaAtuadores = make(map[string]*Atuador)
-var sensors = make(map[string]Sensor)
-var lastSensorData []byte
-var topicos = make(map[string]map[string]net.Conn)
-var clienteTopico = make(map[string]string)
-var clientCount int
-var rwmu sync.RWMutex
-var sensorJobs = make(chan []byte, 500) // buffer de 500 pacotes
+var mapaAtuadores = make(map[string]*Atuador)      // mapa de ID de atuadores para suas conexões e status
+var sensors = make(map[string]Sensor)              // mapa de ID de sensores para seus dados mais recentes
+var lastSensorData []byte                          // dados do sensor mais recentes
+var topicos = make(map[string]map[string]net.Conn) // mapa de tópicos para clientes inscritos (tópico -> ID do cliente -> conexão)
+var clienteTopico = make(map[string]string)        // mapa de ID de cliente para tópico inscrito
+var clientCount int                                // contador de clientes conectados
+var rwmu sync.RWMutex                              // mutex para proteger o acesso a mapas e contador de clientes
+var sensorJobs = make(chan []byte, 500)            // buffer de 500 pacotes para os sensores
 
 // O servidor UDP escuta na porta 1053 para receber dados dos sensores e também aceita conexões TCP para enviar dados aos clientes
 func main() {
@@ -38,6 +38,7 @@ func main() {
 
 	startSensorWorkerPool(10) // 10 workers paralelos
 
+	// verificação periodica dos sensores
 	go func() {
 		for {
 			verificarSensor()

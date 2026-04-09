@@ -5,6 +5,7 @@ import (
 	"net"
 )
 
+// Funções para gerenciar o sistema de publicação/inscrição (pub/sub) dos sensores
 func subscribe(clienteID string, conn net.Conn, SensorID string) {
 	topico := "SENSOR" + ":" + SensorID
 
@@ -22,16 +23,18 @@ func subscribe(clienteID string, conn net.Conn, SensorID string) {
 	if topicos[topico] == nil {
 		topicos[topico] = make(map[string]net.Conn)
 	}
-	topicos[topico][clienteID] = conn
 
+	topicos[topico][clienteID] = conn
 	log.Printf("Cliente %s inscrito no tópico %s", clienteID, topico)
 }
 
+// Função para remover um cliente do tópico em que está inscrito
 func unsubscribe(clienteID string) {
 
 	rwmu.Lock()
 	defer rwmu.Unlock()
 
+	// Verifica se o cliente está inscrito em algum tópico
 	topico, ok := clienteTopico[clienteID]
 	if !ok {
 		return
@@ -47,6 +50,7 @@ func unsubscribe(clienteID string) {
 	log.Printf("Cliente %s removido do tópico %s", clienteID, topico)
 }
 
+// Função para enviar uma mensagem para todos os clientes inscritos em um tópico específico
 func enviarParaTopico(topico string, msg string) {
 	rwmu.RLock()
 	clientes := topicos[topico]

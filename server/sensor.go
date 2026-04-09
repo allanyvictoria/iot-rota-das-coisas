@@ -11,6 +11,7 @@ import (
 // Função para processar os dados recebidos dos sensores.
 func processSensorInput(data []byte) {
 	mensagem, err := ParseMensagem(data)
+
 	if err != nil {
 		log.Printf("Mensagem inválida recebida: %v", err)
 		return
@@ -40,6 +41,7 @@ func processSensorInput(data []byte) {
 	lastSensorData = []byte(strconv.FormatInt(sensorValue, 10))
 	rwmu.Unlock()
 
+	// Publica a atualização do sensor para os clientes inscritos
 	topico := "SENSOR:" + sensorId
 	msg := fmt.Sprintf("\033[2K\rSensor %s: %d", sensorId, sensorValue)
 	enviarParaTopico(topico, msg)
@@ -63,18 +65,18 @@ func receiveSensorData(conn *net.UDPConn) {
 			// enfileirado com sucesso
 		default:
 			log.Println("[AVISO] Fila de sensores cheia, pacote descartado")
-			// telemetria: perda ocasional é aceitável conforme o problema
 		}
 	}
 }
 
+// Função para verificar se os sensores estão ativos
 func verificarSensor() {
 	rwmu.Lock()
 	defer rwmu.Unlock()
 	for sensorID, sensor := range sensors {
 		duracao := time.Since(sensor.Last)
 		if duracao > (5 * time.Second) {
-			delete(sensors, sensorID)
+			delete(sensors, sensorID) // Remove o sensor do map
 			log.Printf("Sensor %s removido por inatividade", sensor.ID)
 		}
 	}
@@ -107,6 +109,7 @@ func sendDataToClient(conn net.Conn, data []byte) {
 	}
 }
 
+// Função para iniciar pool de workers que processa os dados dos sensores em paralelo
 func startSensorWorkerPool(n int) {
 	for i := 0; i < n; i++ {
 		go func() {

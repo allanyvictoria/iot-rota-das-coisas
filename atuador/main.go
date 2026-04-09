@@ -8,22 +8,26 @@ import (
 	"strings"
 )
 
+// Função para obter o endereço do servidor
 func getServerAddr() string {
+	// Tenta obter o endereço do servidor a partir da variável de ambiente
 	addr := os.Getenv("SERVER_ADDR")
+	// Se não estiver definida, usa o nome do serviço no Docker Compose
 	if addr == "" {
-		// No Docker, use o nome do serviço (por exemplo, "server:1053")
-		addr = "server:1053" // Aqui "server" é o nome do serviço no Docker Compose
+		addr = "server:1053"
 	}
 	fmt.Println("Endereço do servidor:", addr)
 	return addr
 }
 
 func main() {
+	// Obtém o hostname do container para usar como ID do sensor
 	hostname, err := os.Hostname()
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	// Conecta ao servidor TCP
 	conn, err := net.Dial("tcp", getServerAddr())
 	if err != nil {
 		log.Fatal("Erro ao conectar ao servidor:", err)
@@ -41,6 +45,7 @@ func main() {
 		log.Fatal("Erro ao enviar dados para o servidor:", err)
 	}
 
+	// Loop principal do atuador, aguardando comandos do servidor
 	for {
 		buffer := make([]byte, 1024)
 		n, err := conn.Read(buffer)
@@ -67,6 +72,7 @@ func main() {
 	}
 }
 
+// função para processar o comando recebido e atualizar o status do atuador
 func comandoAtuador(cmd string, status *string) string {
 	switch cmd {
 	case "on":

@@ -9,38 +9,41 @@ import (
 	"time"
 )
 
+// Função para obter o endereço do servidor
 func getServerAddr() string {
+	// Tenta obter o endereço do servidor a partir da variável de ambiente
 	addr := os.Getenv("SERVER_ADDR")
+	// Se não estiver definida, usa o nome do serviço no Docker Compose
 	if addr == "" {
-		addr = "server:1053" // Aqui "server" é o nome do serviço no Docker Compose
+		addr = "server:1053"
 	}
 	fmt.Println("Endereço do servidor:", addr)
 	return addr
 }
 
 func main() {
-
+	// Obtém o hostname do container para usar como ID do sensor
 	hostname, err := os.Hostname()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// Definir o endereço do servidor, usando a função getServerAddr() para obter o IP
-	addr := getServerAddr() // Isso retorna "server:1053"
+	addr := getServerAddr()
 
-	// Resolve o endereço UDP (isso converte "server" no IP do container)
+	// Resolve o endereço UDP do servidor
 	udpAddr, err := net.ResolveUDPAddr("udp", addr)
 	if err != nil {
 		log.Fatal("Erro ao resolver endereço:", err)
 	}
 
-	// Create a UDP connection to the server
+	// Cria uma conexão UDP para enviar dados dos sensores
 	conn, err := net.DialUDP("udp", nil, udpAddr)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer conn.Close()
 
+	// Loop principal do sensor, enviando dados periodicamente
 	for {
 
 		id := hostname
@@ -53,7 +56,7 @@ func main() {
 			log.Fatal(err)
 		}
 
-		// Interface terminal do sensor
+		// Exibe o valor enviado e o horário no console do sensor
 		fmt.Printf("\r\033[2K\r[SENSOR %s] Valor enviado: %d | Horário: %s", id, temp, last)
 
 		time.Sleep(1 * time.Millisecond)

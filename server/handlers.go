@@ -27,8 +27,6 @@ func handleConnection(conn net.Conn) {
 
 	switch tipo {
 	case "INICIAL":
-		msg := "////////////////////////////////////SEJA BEM VINDO AO SERVIDOR////////////////////////////////////////\n"
-		conn.Write([]byte(msg))
 		lerComando(conn, id)
 
 	case "ATUADOR":
@@ -40,6 +38,7 @@ func handleConnection(conn net.Conn) {
 			Conn:   conn,
 			Fila:   make(chan Mensagem, 10),
 		}
+
 		mapaAtuadores[id] = novoAtuador
 		rwmu.Unlock()
 
@@ -72,6 +71,7 @@ func handleConnection(conn net.Conn) {
 
 }
 
+// Função para exibir o menu para o cliente.
 func menu(conn net.Conn) {
 	mensagem := "\n>>>>>>>>>>>>>>>>>> MENU <<<<<<<<<<<<<<<<<<\n" +
 		"[1] - Listar sensores disponiveis\n" +
@@ -83,14 +83,16 @@ func menu(conn net.Conn) {
 	conn.Write([]byte(mensagem))
 }
 
+// Função para ler os comandos do cliente e processá-los.
 func lerComando(conn net.Conn, clienteId string) {
 
 	bufferCliente := make([]byte, 1024)
 	for {
 		menu(conn)
 
+		// Pazo para o cliente enviar um comando(30 segundos) e não ser considerado inativo.
 		conn.SetReadDeadline(time.Now().Add(30 * time.Second))
-		n, err := conn.Read(bufferCliente) // ← usa o n aqui
+		n, err := conn.Read(bufferCliente)
 		conn.SetReadDeadline(time.Time{})
 
 		if err != nil {
@@ -121,7 +123,7 @@ func lerComando(conn net.Conn, clienteId string) {
 				}
 				if msgSensor.COMANDO == "PARAR" {
 					unsubscribe(clienteId)
-					conn.Write([]byte("\n[SERVIDOR]: Monitoramento parado\n"))
+					conn.Write([]byte("\n[SERVID4OR]: Monitoramento parado\n"))
 					break
 				}
 				rwmu.RLock()
@@ -147,7 +149,6 @@ func lerComando(conn net.Conn, clienteId string) {
 			sendAvailableAtuadores(conn)
 
 		case "ATUAR":
-
 			buff := make([]byte, 1024)
 			n, err := conn.Read(buff)
 			if err != nil {
