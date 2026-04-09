@@ -123,7 +123,7 @@ func lerComando(conn net.Conn, clienteId string) {
 				}
 				if msgSensor.COMANDO == "PARAR" {
 					unsubscribe(clienteId)
-					conn.Write([]byte("\n[SERVID4OR]: Monitoramento parado\n"))
+					conn.Write([]byte("\n[SERVIDOR]: Monitoramento parado\n"))
 					break
 				}
 				rwmu.RLock()
